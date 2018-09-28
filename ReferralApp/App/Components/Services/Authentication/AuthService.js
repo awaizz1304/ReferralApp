@@ -5,7 +5,7 @@ import { Base_URL } from "../../Common/Constants";
 
 class AuthService {
     httpConfig = null
-    AuthDataService(){
+    AuthService(){
         this.httpConfig = new HttpRequestConfigs()
         this.httpConfig.timeout = 1000
     }

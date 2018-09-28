@@ -14,6 +14,7 @@ export default class Settings extends Component {
             return <Image source = {imageSource} />
         },
         tabBarButtonComponent: TouchableBounce,
+        tabBarLabel : "Settings",
     };
     componentDidMount (){
         

@@ -1,101 +1,104 @@
 import React , {
     Component
 } from 'react';
-import {StyleSheet ,Platform ,Text ,View ,Button, TextInput, TouchableOpacity,KeyboardAvoidingView } from 'react-native';
-import { validateEmail, validatePassword, validateMobileNumber } from '../Components/Utilities/Validator';
-import { Dialog, ProgressDialog } from 'react-native-simple-dialogs';
+import {StyleSheet ,Platform ,Text ,View,Button, Image,TouchableOpacity,TextInput, ScrollView  } from 'react-native';
+import TouchableBounce from 'react-native/Libraries/Components/Touchable/TouchableBounce';
+import CustomTextInput from './UIComponents/CustomTextInput';
+import { validateMobileNumber, validateEmail } from '../Components/Utilities/Validator';
+import ReferDataModel from '../Components/Services/DataService/DataModels/ReferDataModel';
 import ClientLayer from '../Components/Layers/ClientLayer';
-import SignUpDataModel from '../Components/Services/Authentication/DataModels/SignUpDataModel';
+import { Dialog, ProgressDialog } from 'react-native-simple-dialogs'
 
 const Dimensions = require('Dimensions');
 const window = Dimensions.get('window');
 
-export default class Signup extends Component {
-    canSignUp = false
-    signUpDataModel = null
+export default class Refer extends Component {
+    canRefer = false
     constructor(props){
         super(props)
         this.state = {
-            name : "",
-            mobileNumber : "",
-            email: "",
-            city : "",
-            password : "",
-            invalidNameText : "",invalidMobileText: "",invalidEmailText: "",invalidCityText: "",invalidPassText: "",
+            name : "awais",
+            mobileNumber : "03425551334",
+            email : "a@k.com",
+            city : "Rawalpindi",
+            invalidNameText : "",invalidMobileText: "",invalidEmailText: "",invalidCityText: "",
             showLoading : false,
             showDialoge : false,
-            errorMessage : "",
-            errorDescription : "",
-        };
+            dialogeTitle : "",
+            dialogeDescription : "",
+        }
+        
     }
     componentDidMount (){
-        // const {actions} = this.props
-        // actions.ScreenChanged('Signup')
+        
     }
-    
-    OnSignUpPressed = () => {
-        this.canSignUp = true
+    OnClosePressed () {
+        this.props.navigation.goBack()
+    }
+    OnReferPressed = () => {
+        this.canRefer = true
         this.setState({invalidNameText:""})
         this.setState({invalidMobileText:""})
         this.setState({invalidEmailText:""})
         this.setState({invalidCityText:""})
-        this.setState({invalidPassText:""})
 
         if(this.state.name == ""){
-            this.canSignUp = false
+            this.canRefer = false
             this.setState({invalidNameText:"Enter a valid name"})
         }
         if(!validateMobileNumber(this.state.mobileNumber)){
-            this.canSignUp = false
+            this.canRefer = false
             this.setState({invalidMobileText: "Enter a valid mobile number"})
         }
 
         if(!validateEmail(this.state.email)){
-            this.canSignUp = false
+            this.canRefer = false
             this.setState({invalidEmailText: "Enter a valid email"})
         }
 
         if(this.state.city == ""){
-            this.canSignUp = false
+            this.canRefer = false
             this.setState({invalidCityText: "Enter a valid city"})
         }
 
-
-        if(!validatePassword(this.state.password)){
-            this.canSignUp = false
-            this.setState({invalidPassText: "Password must contain 5 characters"})
-        }
-
-        if(this.canSignUp){
-            // Signup here
-            this.setState({showLoading:true})
-            this.signUpDataModel = new SignUpDataModel()
-            this.signUpDataModel.name = this.state.name
-            this.signUpDataModel.mobileNumber = this.state.mobileNumber
-            this.signUpDataModel.email = this.state.email
-            this.signUpDataModel.city = this.state.city
-            this.signUpDataModel.password = this.state.password
-            ClientLayer.getInstance().getAuthService().SignUp(this.signUpDataModel,()=>{
-                this.setState({showLoading:false})
+        if(this.canRefer){
+            referDataModel = new ReferDataModel()
+            referDataModel.name = this.state.name
+            referDataModel.mobileNumber = this.state.mobileNumber
+            referDataModel.email = this.state.email
+            referDataModel.city = this.state.city
+            this.setState({showLoading : true})
+            ClientLayer.getInstance().getDataService().referFriend(this.referDataModel,()=>{
+                this.nameInput.clear()
+                this.mobileNumberInput.clear()
+                this.emailInput.clear()
+                this.cityInput.clear()
+                this.setState({showLoading:false, showDialoge : true,dialogeTitle : "Success",dialogeDescription : "Referal Successful"})
             },(error)=>{
-                this.setState({showLoading : false,showDialoge : true,errorMessage : "Error",errorDescription : error.description})
+                this.setState({showLoading : false,showDialoge : true,dialogeTitle : "Error",dialogeDescription : error.description})
             })
         }
     }
-
     render (){
         return(
             <View style = {styles.backgroundContainer}>
-                
+                <View style = {styles.crossImageContainer}>
+                    <TouchableOpacity onPress = {this.OnClosePressed.bind(this)}>
+                        <View style = {styles.crossImage}>
+                        </View>
+                   </TouchableOpacity>
+                </View>
                 <View style = {styles.container}>
-                    <View style = {styles.headingTextContainer}>
-                        <Text style = {styles.headingText}>Sign Up</Text>
+                    <View style = {styles.logoContainer}>
+                        <Image styles = {styles.logoImage } source = {require('../../Assets_icons/AddReferral/Refer1x.png')}/>
+                        <Text style = {styles.headingText}>Refer Now and Earn</Text>
+                        <Text style = {styles.headingText}>rewards!</Text>
                     </View>
                     <View style = {styles.formContainer}>
                         <TextInput
                             style = {styles.input}
                             defaultValue = {this.state.name}
-                            placeholder = "Name"
+                            placeholder = "Referral's Name"
                             placeholderTextColor = "#42687C"
                             returnKeyType = "next"
                             autoCorrect = {false}
@@ -125,7 +128,7 @@ export default class Signup extends Component {
                         <TextInput
                             style = {styles.input}
                             placeholder = "Email"
-                            defaultValue = {this.state.email}
+                            defaultValue = "a@k.com"
                             placeholderTextColor = "#42687C"
                             returnKeyType = "next"
                             keyboardType = "email-address"
@@ -141,9 +144,9 @@ export default class Signup extends Component {
                         <TextInput
                             style = {styles.input}
                             placeholder = "City"
-                            defaultValue = {this.state.city}
+                            defaultValue = "Rawalpindi"
                             placeholderTextColor = "#42687C"
-                            returnKeyType = "next"
+                            returnKeyType = "go"
                             autoCorrect = {false}
                             ref = {(input) => this.cityInput = input}
                             onChangeText = {(text) => this.setState({city : text})}
@@ -152,25 +155,10 @@ export default class Signup extends Component {
                         <View style = {styles.emptySpace}>
                             <Text style = {styles.invalidText}>{this.state.invalidCityText}</Text>
                         </View>
-                        <TextInput
-                            style = {styles.input}
-                            placeholder = "Password"
-                            defaultValue = {this.state.password}
-                            placeholderTextColor = "#42687C"
-                            returnKeyType = "go"
-                            autoCorrect = {false}
-                            secureTextEntry = {true}
-                            ref = {(input) => this.passwordInput = input}
-                            onChangeText = {(text) => this.setState({password : text})}
-                            clearButtonMode = "unless-editing"
-                        />
-                        <View style = {styles.emptySpace}>
-                            <Text style = {styles.invalidText}>{this.state.invalidPassText}</Text>
-                        </View>
                     </View>
-                    <View style = {styles.signUpButtonContainer}>
-                        <TouchableOpacity style = {styles.signUpButton} onPress = {this.OnSignUpPressed}>
-                            <Text style = {styles.signUpButtonText}>Signup</Text>
+                    <View style = {styles.loginButtonContainer}>
+                        <TouchableOpacity style = {styles.loginButton} onPress = {this.OnReferPressed}>
+                            <Text style = {styles.buttonText}>Refer</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -182,10 +170,10 @@ export default class Signup extends Component {
                 />
                 <Dialog
                     visible = {this.state.showDialoge }
-                    title = {this.state.errorMessage}
+                    title = {this.state.dialogeTitle}
                     onTouchOutside = {() => this.setState({showDialoge : false})}>
                     <View>
-                        <Text style = {styles.errorText}>{this.state.errorDescription}</Text>
+                        <Text style = {styles.dialogeText}>{this.state.dialogeDescription}</Text>
                         <TouchableOpacity onPress = {() => {
                             this.setState ({showDialoge : false});
                         }}>
@@ -193,18 +181,28 @@ export default class Signup extends Component {
                         </TouchableOpacity>
                     </View>
                 </Dialog>
-            </View>
 
-            
+            </View>
         )
     }
-
 }
-const styles = StyleSheet.create({
-    backgroundContainer: {
-        flex: 1,
-        backgroundColor: '#FFFFFF',
+
+const styles = StyleSheet.create ({
+    backgroundContainer : {
+        flex : 1,
+        backgroundColor : '#fff',
         justifyContent : 'center',
+        // alignItems : 'center',
+    },
+    crossImageContainer : {
+        alignItems : 'flex-end',
+        marginRight : '10%',
+    },
+    crossImage : {
+        width : 30,
+        height : 30,
+        borderRadius : 15,
+        backgroundColor : "#0093ca",
     },
     container : {
         justifyContent : 'space-between',
@@ -213,10 +211,24 @@ const styles = StyleSheet.create({
         alignItems : 'center',
         backgroundColor : '#fff',
     },
+    logoContainer : {
+        alignItems : 'center',
+        justifyContent : 'center'
+    },
+    logoImage : {
+        width : 100,
+        height : 100,
+    },
+    headingText : {
+        textAlign : 'center',
+        fontSize : 20,
+        color : '#145370',
+        fontWeight : "bold",
+    },
     formContainer : {
 
     },
-    input :{
+    input : {
         height : 50,
         width : window.width * 0.8,
         shadowOffset:{  width: 2,  height: 5,  },
@@ -227,22 +239,13 @@ const styles = StyleSheet.create({
         backgroundColor : '#FFFFFF',
         shadowRadius : 8,
         elevation : 8,
-        paddingLeft : 10,
     },
-    headingTextContainer : {
-        alignItems : 'center',
-    },
-    headingText :{
-        fontSize: 20,
-        color: '#23536E',
-        textAlign: "center",
-    },
-    signUpButtonContainer :{
+    loginButtonContainer :{
         marginTop : 10,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    signUpButton : {
+    loginButton : {
         height : 50,
         borderRadius : 30,
         width : window.width * 0.8,
@@ -250,14 +253,18 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    buttonText : {
+        textAlign : 'center',
+        fontWeight : '700',
+        color : '#ffffff',
+        fontSize : 20,
+    },
     invalidText : {
         color : 'red',
         marginLeft : 20,
     },
-    signUpButtonText :{
-        textAlign : 'center',
-        fontWeight : '700',
-        color : '#ffffff',
+    emptySpace : {
+        height : 20,
     },
     closePopupText : {
         marginTop : 15,
@@ -265,11 +272,8 @@ const styles = StyleSheet.create({
         textAlign : 'center',
         fontWeight : '700',
     },
-    errorText : {
+    dialogeText : {
         marginTop : 2,
         textAlign : 'center',
-    },
-    emptySpace : {
-        height : 20,
     },
 });

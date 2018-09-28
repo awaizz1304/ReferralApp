@@ -21,7 +21,7 @@ type Props = {};
 // Select which screen to show depending on stored session
 function StartScreen(props) {
   const isLoggedIn = props.isLoggedIn;
-  if(!isLoggedIn){
+  if(isLoggedIn){
     return <HomeNavigationStack/>
   }
   else{
@@ -39,7 +39,6 @@ class App extends Component<Props> {
   }
 
   componentDidMount () {
-    console.log("componentDidMount")
     this.Initialize();
     this.setState({initialzed : true})
   }

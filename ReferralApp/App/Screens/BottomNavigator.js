@@ -7,11 +7,17 @@ import Dashboard from './Dashboard';
 import Referrals from './Referrals';
 import Rewards from './Rewards';
 import Settings from './Settings';
+import AddButton from './AddButton';
 
-
-export default createBottomTabNavigator ({
+export default createBottomTabNavigator({
     Dashboard : {screen : Dashboard},
     Referrals : {screen : Referrals},
+    Adding :  { screen : () => null,
+        navigationOptions: () => ({
+            tabBarIcon: <AddButton /> ,
+            tabBarLabel : " ",
+        })
+    },
     Rewards : {screen : Rewards},
     Settings : {screen : Settings},
 },{
